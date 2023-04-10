@@ -28,13 +28,20 @@ In the book and in the lecture, Test-and-Set is used to create a spin lock. The 
 
 What are the tradeoffs with the Approximate Counter in the book when updating the global counter more or less frequently?
 
-
+The trade off with the approximate counter is between accuracy and performance. If the global counter is updated more frequently, the accuracy of the counter will be higher, but the performance will be lower. If the global counter is updated less frequently, the accuracy of the counter will be lower, but the performance will be higher.
 
 Why does having locks on both the head and tail of the concurrent queue have a performance advantage over having one big lock for the whole thing?
 
+Having locks at the head and the tail of the concurrent queue allows for concurrency between enqueues and dequeues. If there was only one lock for the whole queue, then the queue would be locked while an enqueue or dequeue was happening, and the other operation would have to wait until the lock was released.
+
 Why doesn't the concurrent hash table in the reading need any locks in any of the Hash_ functions?
 
+The concurrent hash table uses a lock per hash bucket which is represented by a list. The Hash_ functions only access one bucket at a time, so there is no need for a lock on the whole table.
+
 In the concurrent queue in the book, speculate on why the dummy node is required.
+
+I think the dummy node is required to help you maintain the head and tail pointers. By using the dummy node you can ensure that the tail doesn't fall behind the head and that it will never point to a node that is not accessible through the head pointer. I also think it keeps the head and tail from being set to null. 
+
 
 
 # Locking Things

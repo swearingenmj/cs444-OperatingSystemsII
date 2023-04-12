@@ -26,6 +26,4 @@ int main(void)
     rc = pthread_join(p2, NULL); assert(rc == 0);
 
     printf("Threads complete!\n");
-
-    return 0;
 }

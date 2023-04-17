@@ -104,3 +104,105 @@ pthread_mutex_unlock(&lock);
 
 ```
 
+# Locking Data Structures
+
+struct node 
+{
+    int value;
+    struct node *next;
+};
+
+pthread_mutex_t lock_mutex = PTHREAD_MUTEX_INITIALIZER;
+
+```
+void llist_insert(struct node **head, int value) 
+{
+    struct node *new = malloc(sizeof(struct node));
+    new->value = value;
+
+    <!-- lock(); -->
+    pthread_mutex_lock(&lock_mutex);
+
+    new->next = *head;
+    *head = new;
+
+    <!-- unlock(); -->
+    pthread_mutex_unlock(&lock_mutex);
+}
+
+int llist_delete(struct node **head) 
+{
+    lock();
+    
+    struct node *old_head = *head;
+    *head = old_head->next;
+
+    unlock();
+
+    int value = old_head->value;
+    free(old_head);
+    return value;
+}
+
+struct node *llist_find(struct node *head, int value) 
+{
+    struct node *return_value = NULL;
+    lock();
+
+    while (head != NULL)
+    {
+        if (head->value == value)
+        {
+            <!-- unlock(); -->
+            <!-- return head; -->
+            return_value = head;
+            break;
+        }
+        head = head->next;
+    }
+
+    unlock();
+    return return_value;
+}
+
+int main(void)
+{
+    struct node *head = NULL;
+
+    llist_insert(&head, 1);
+    llist_insert(&head, 2);
+    llist_insert(&head, 3);
+
+    struct node *found = llist_find(head, 2);
+    printf("found: %d\n", found->value);
+
+    int deleted = llist_delete(&head);
+    printf("deleted: %d\n", deleted);
+}
+
+```
+
+# Lock-free Data Structures
+
+```
+int compare_and_swap(int *ptr, int expected, int new) 
+{
+    int original = *ptr;
+    if (original == expected)
+    {
+        *ptr = new;
+    }
+    return original;
+}
+
+void llist_insert(struct node **head, int value) 
+{
+    struct node *new = malloc(sizeof(struct node));
+    new->value = value;
+
+    do 
+    {
+        new->next = *head;
+    } while (compare_and_swap(head, new->next, new) != new->next);
+}
+```

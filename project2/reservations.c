@@ -13,6 +13,11 @@ int seat_taken_count = 0;
 
 pthread_mutex_t seat_lock = PTHREAD_MUTEX_INITIALIZER;
 
+int is_free(int n) {
+    // Returns true if the given seat is available.
+    return !seat_taken[n];
+}
+
 int reserve_seat(int n)
 {
     // Attempt to reserve seat number n
@@ -25,14 +30,14 @@ int reserve_seat(int n)
 
     pthread_mutex_lock(&seat_lock);
 
-    if (seat_taken[n] == 1) {
-        pthread_mutex_unlock(&seat_lock);
-        return -1;
-    } else {
+    if (is_free(n)) {
         seat_taken[n] = 1;
         seat_taken_count++;
         pthread_mutex_unlock(&seat_lock);
         return 0;
+    } else {
+        pthread_mutex_unlock(&seat_lock);
+        return -1;
     }
 }
 
@@ -48,23 +53,13 @@ int free_seat(int n)
 
     pthread_mutex_lock(&seat_lock);
 
-    if (seat_taken[n] == 0) {
-        pthread_mutex_unlock(&seat_lock);
-        return -1;
-    } else {
+    if (!free_seat(n)) {
         seat_taken[n] = 0;
         seat_taken_count--;
         pthread_mutex_unlock(&seat_lock);
         return 0;
-    }
-}
-
-int is_free(int n) {
-    // Returns true if the given seat is available.
-
-    if (seat_taken[n]) {
-        return 0;
     } else {
+        pthread_mutex_unlock(&seat_lock);
         return -1;
     }
 }

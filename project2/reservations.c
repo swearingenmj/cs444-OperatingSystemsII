@@ -53,7 +53,7 @@ int free_seat(int n)
 
     pthread_mutex_lock(&seat_lock);
 
-    if (!free_seat(n)) {
+    if (!is_free(n)) {
         seat_taken[n] = 0;
         seat_taken_count--;
         pthread_mutex_unlock(&seat_lock);

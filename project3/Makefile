@@ -1,6 +1,2 @@
-reservations: pcseml.c
-	gcc -Wall -Wextra -o $@ $^ -lpthread
-
-reservations.zip:
-	rm -f $@
-	zip $@ Makefile pcseml.c
+pcseml: pcseml.c eventbuf.c
+	gcc -Wall -Wextra -o pcseml pcseml.c eventbuf.c -lpthread

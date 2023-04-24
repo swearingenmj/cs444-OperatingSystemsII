@@ -82,6 +82,7 @@ void *consumer(void *arg) {
         if (eventbuf_empty(eventbuf)) {
             // if it is, we're done! time to unlock the mutex and exit the loop
             sem_post(mutex);
+            sem_post(full);
             printf("C%d: exiting\n", *id);
             return NULL;
         }

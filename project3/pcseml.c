@@ -105,8 +105,8 @@ void *consumer(void *arg) {
 
 int main(int argc, char *argv[]) {
     // Parse the command line
-    if (argc != 4) {
-        printf("Usage: ./pcseml %s <number of producers> <number of consumers> <number of events>", argv[0]);
+    if (argc != 5) {
+        printf("Usage: ./pcseml <number of producers> <number of consumers> <number of events> <outstanding events>");
         return 1;
     }
 

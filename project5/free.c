@@ -1,8 +1,4 @@
-// #include <stdio.h>
-// #include <stdlib.h>
-// #include <unistd.h>
 #include "free.h"
-// #include "inode.h"
 #include "block.h"
 
 int find_low_clear_bit(unsigned char x) {

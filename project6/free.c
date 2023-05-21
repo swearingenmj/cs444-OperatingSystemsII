@@ -21,7 +21,7 @@ void set_free(unsigned char *block, int num, int set){
 
 int find_free(unsigned char *block){
     int free_bit = -1;
-    for (int byte=0; byte<4096; byte++){
+    for (int byte=0; byte<BLOCK_SIZE; byte++){
         free_bit = find_low_clear_bit(block[byte]);
         if (free_bit != -1){
             free_bit += (byte * 8);

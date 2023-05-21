@@ -6,9 +6,9 @@
 #include <string.h>
 
 void mkfs(void){
-    unsigned char buf[4096] = {0};
-    for (int i=0; i<1024; i++){
-        write(image_fd, buf, 4096);
+    unsigned char buf[BLOCK_SIZE] = {0};
+    for (int i=0; i<NUM_OF_BLOCKS; i++){
+        write(image_fd, buf, BLOCK_SIZE);
     }
     for (int i=0; i<7; i++){
         alloc();

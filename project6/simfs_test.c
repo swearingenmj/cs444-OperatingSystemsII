@@ -22,7 +22,7 @@ void test_image_close(void){
 
 void test_bwrite_and_bread(void){
     unsigned char write_block[BLOCK_SIZE] = "hello";
-    unsigned char read_block[BLOCK_SIZE];
+    unsigned char read_block[BLOCK_SIZE] = {0};
     CTEST_ASSERT(memcmp(write_block, read_block, BLOCK_SIZE) != 0, "assert originating buffers don't match");
     bwrite(3, write_block);
     bread(3, read_block);
@@ -169,16 +169,16 @@ void test_ialloc(void){
 int main(){
 
     CTEST_VERBOSE(1);
-    // test_image_open();
-    // test_image_close();
-    // test_mkfs();
-    // test_alloc();
-    // test_ialloc();
-    // test_bwrite_and_bread();
-    // test_find_free();
-    // test_set_free();
-    // test_find_incore_free();
-    // test_find_incore();
+    test_image_open();
+    test_image_close();
+    test_mkfs();
+    test_alloc();
+    test_ialloc();
+    test_bwrite_and_bread();
+    test_find_free();
+    test_set_free();
+    test_find_incore_free();
+    test_find_incore();
     test_read_inode();
     test_iget();
     test_iput();

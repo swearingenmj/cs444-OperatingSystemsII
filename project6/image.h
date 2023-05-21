@@ -5,6 +5,7 @@
 #define INODE_MAP_NUM 1
 #define DATA_MAP_NUM 2
 #define BLOCK_SIZE 4096
+#define NUM_OF_BLOCKS 1024
 #define SET_UNAVAILABLE 1
 #define SET_AVAILABLE 0
 #define DO_TRUNCATE 1

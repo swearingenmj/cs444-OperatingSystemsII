@@ -20,7 +20,6 @@ void empty_incore_array(void){
     memset(incore, 0, sizeof incore);
 }
 
-
 struct inode *ialloc(void){
     unsigned char inode_map[BLOCK_SIZE] = {0};
     bread(INODE_MAP_NUM, inode_map);
@@ -47,32 +46,25 @@ struct inode *ialloc(void){
 }
 
 struct inode *find_incore_free(void){
-    printf("_find_incore_free\n");
-    int free_incore_index = -1;
+    int free_incore_index = NODE_MIA;
     for(int i=0; i<MAX_SYS_OPEN_FILES; i++){
         if(incore[i].ref_count == 0){
             free_incore_index = i;
             break;
         }
     }
-    // if (free_incore_index == -1) {
-    //     return NULL;
-    // } else {
-    //     return &incore[free_incore_index];
-    // }
-    // printf(" mem of incore[free] %d\n", incore[free_incore_index]);
-    return (free_incore_index != -1) ? &incore[free_incore_index] : NULL;
+    return (free_incore_index != NODE_MIA) ? &incore[free_incore_index] : NULL;
 }
 
 struct inode *find_incore(unsigned int inode_num){
-    int incore_index = -1;
+    int incore_index = NODE_MIA;
     for(int i=0; i<MAX_SYS_OPEN_FILES; i++){
         if(incore[i].inode_num == inode_num && incore[i].ref_count > 0){
             incore_index = i;
             break;
         }
     }
-    return (incore_index != -1) ? &incore[incore_index] : NULL;
+    return (incore_index != NODE_MIA) ? &incore[incore_index] : NULL;
 }
 
 void read_inode(struct inode *in, int inode_num){
@@ -84,15 +76,15 @@ void read_inode(struct inode *in, int inode_num){
     // read data from inode with block_num on disk into inode_block
     unsigned char inode_block[BLOCK_SIZE];
     bread(block_num, inode_block);
-    printf("__inode_block%s\n", inode_block);
+
     // read inode_block data into block
     in->size = read_u32(inode_block + block_offset_bytes);
-    in->owner_id = read_u16(inode_block + block_offset_bytes + 4);
-    in->permissions = read_u8(inode_block + block_offset_bytes + 6);
-    in->flags = read_u8(inode_block + block_offset_bytes + 7);
-    in->link_count = read_u8(inode_block + block_offset_bytes + 8);
+    in->owner_id = read_u16(inode_block + block_offset_bytes + OWNER_ID_OFFSET);
+    in->permissions = read_u8(inode_block + block_offset_bytes + PERMISSIONS_OFFSET);
+    in->flags = read_u8(inode_block + block_offset_bytes + FLAGS_OFFSET);
+    in->link_count = read_u8(inode_block + block_offset_bytes + LINK_COUNT_OFFSET);
     for (int i=0; i<16; i++){
-        int offset_index = (i*2) + 9;
+        int offset_index = (i*PER_BLOCK_PTR_OFFSET) + BLOCK_PTR_OFFSET;
         in->block_ptr[i] = read_u16(inode_block + block_offset_bytes + offset_index);
     }
 }
@@ -109,18 +101,17 @@ void write_inode(struct inode *in){
 
     // pack (write) to the disk from in
     write_u32(inode_block + block_offset_bytes, in->size);
-    write_u16(inode_block + block_offset_bytes + 4, in->owner_id);
-    write_u8(inode_block + block_offset_bytes + 6, in->permissions);
-    write_u8(inode_block + block_offset_bytes + 7, in->flags);
-    write_u8(inode_block + block_offset_bytes + 8, in->link_count);
+    write_u16(inode_block + block_offset_bytes + OWNER_ID_OFFSET, in->owner_id);
+    write_u8(inode_block + block_offset_bytes + PERMISSIONS_OFFSET, in->permissions);
+    write_u8(inode_block + block_offset_bytes + FLAGS_OFFSET, in->flags);
+    write_u8(inode_block + block_offset_bytes + LINK_COUNT_OFFSET, in->link_count);
     for (int i=0; i<16; i++){
-        int offset_index = (i*2) + 9;
+        int offset_index = (i*PER_BLOCK_PTR_OFFSET) + BLOCK_PTR_OFFSET;
         write_u16(inode_block + block_offset_bytes + offset_index, in->block_ptr[i]);
     }
 
     // write data from block to disk
     bwrite(in->inode_num, inode_block);
-    printf("__write_inode struct: %d\n", in->size);
 }
 
 struct inode *iget(int inode_num){
@@ -131,7 +122,6 @@ struct inode *iget(int inode_num){
         return incore_node;
     } 
     if (find_incore_free() == NULL) {
-        printf("__no nodes :'(\n");
         return NULL;
     } else {
         incore_node = find_incore_free();

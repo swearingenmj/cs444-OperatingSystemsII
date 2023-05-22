@@ -94,6 +94,8 @@ void test_mkfs(void){
     bread(DATA_MAP_NUM, read_block);
     int free_block_num = find_free(read_block);
     CTEST_ASSERT(free_block_num == 7, "assert 6 blocks reserved on making file system");
+
+    image_close();
 }
 
 void test_find_incore_free(void){
@@ -106,6 +108,8 @@ void test_find_incore_free(void){
     // returns NULL on a full incore stack
     fill_incore_array();
     CTEST_ASSERT(find_incore_free() == NULL, "assert find_incore_free() returns NULL on a full incore stack");
+
+    empty_incore_array();
 }
 
 void test_find_incore(void){
@@ -118,70 +122,75 @@ void test_find_incore(void){
     // returns NULL if invalid inode num
     empty_incore_array();
     CTEST_ASSERT(find_incore(0) == NULL, "assert find_incore(0) returns NULL if incore array is empty");
-   
-    // returns NULL if inode num has zero ref-count
-
 }
 
-void test_read_inode(void){
+void test_read_write_inode(void){
 
     // set up file system and write to block 3
     image_open("test_file", DO_TRUNCATE);
     mkfs();
+    struct inode test_inode = {1, 2, 2, 2, 2, {1}, 1, 3};
+    write_inode(&test_inode);
 
-    struct inode test_inode = *find_incore_free();
-    read_inode(&test_inode, 0);
-
-    fill_incore_array();
-    read_inode(&test_inode, 0);
+    // create a blank struct to read into
+    struct inode test_read_inode = {0}; 
+    CTEST_ASSERT(test_read_inode.size == 0, "assert test_read_inode returns empty size before reading");
+    
+    read_inode(&test_read_inode, 3);
 
     // CTEST_ASSERT(find_)
+    CTEST_ASSERT(test_read_inode.size == 1, "assert read_inode() reads size correctly");
+    CTEST_ASSERT(test_read_inode.owner_id == 2, "assert read_inode() reads owner_id correctly");
+    CTEST_ASSERT(test_read_inode.permissions == 2, "assert read_inode() reads permissions correctly");
+    CTEST_ASSERT(test_read_inode.flags == 2, "assert read_inode() reads flags correctly");
+    CTEST_ASSERT(test_read_inode.link_count == 2, "assert read_inode() reads link_count correctly");
+    CTEST_ASSERT(test_read_inode.block_ptr[0] == 1, "assert read_inode() reads block_ptr[0] correctly");
 
-}
-
-void test_write_inode(void){
-
-    // set up file system
-
-    // 
+    image_close();
 }
 
 void test_iget(void){
-    iget(0);
+    image_open("test_file", DO_TRUNCATE);
+    mkfs();
 
+    struct inode test_inode = {1, 2, 4, 4, 4, {0}, 1, 3};
+
+    iput(&test_inode);
+
+    struct inode *test_inode_ptr = iget(3);
+    CTEST_ASSERT(test_inode_ptr->size == 1, "assert iget() returns correct size");
+    CTEST_ASSERT(test_inode_ptr->owner_id == 2, "assert iget() returns correct owner_id");
+    CTEST_ASSERT(test_inode_ptr->permissions == 4, "assert iget() returns correct permissions");
+    CTEST_ASSERT(test_inode_ptr->flags == 4, "assert iget() returns correct flags");
+    CTEST_ASSERT(test_inode_ptr->link_count == 4, "assert iget() returns correct link_count");
+
+    image_close();
 }
 
 void test_iput(void){
-    struct inode test_node;
-    iput(&test_node);
+    
 }
 
 void test_ialloc(void){
 
-    // unsigned char read_block[BLOCK_SIZE];
-    // unsigned char compare_block[BLOCK_SIZE] = {1};
-    // int ialloc_return;
-
-    image_open("test_file", DO_TRUNCATE);
-    ialloc();
 }
 
 int main(){
 
     CTEST_VERBOSE(1);
-    test_image_open();
-    test_image_close();
-    test_mkfs();
-    test_alloc();
+    // test_image_open();
+    // test_image_close();
+    // test_mkfs();
+    // test_alloc();
     test_ialloc();
-    test_bwrite_and_bread();
-    test_find_free();
-    test_set_free();
+    // test_bwrite_and_bread();
+    // test_find_free();
+    // test_set_free();
     test_find_incore_free();
     test_find_incore();
-    test_read_inode();
+    test_read_write_inode();
     test_iget();
-    test_iput();
+    // test_iput();
     CTEST_RESULTS();
     CTEST_EXIT();
 

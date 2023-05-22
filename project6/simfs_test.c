@@ -149,7 +149,7 @@ void test_read_write_inode(void){
     image_close();
 }
 
-void test_iget(void){
+void test_iget_iput(void){
     image_open("test_file", DO_TRUNCATE);
     mkfs();
 
@@ -167,30 +167,41 @@ void test_iget(void){
     image_close();
 }
 
-void test_iput(void){
-    
-}
-
 void test_ialloc(void){
 
+    image_open("test_file", DO_TRUNCATE);
+    mkfs();
+   
+    // on empty incore array, expect pointer to 0
+    struct inode *test_inode = ialloc();
+    CTEST_ASSERT(test_inode->size == 0, "assert ialloc() returns inode with size 0 on new incore array and inode map");
+    
+    // fill inode metadata, assert NULL 
+    unsigned char test_block[BLOCK_SIZE];
+    memset(test_block, 255, BLOCK_SIZE);
+    bwrite(INODE_MAP_NUM, test_block);
+    CTEST_ASSERT(ialloc() == NULL, "assert ialloc() returns NULL values on full inode map");
+
+    // fill incore array, assert null
+    fill_incore_array();
+    CTEST_ASSERT(ialloc() == NULL, "assert ialloc() returns NULL values on full incore array");
 }
 
 int main(){
 
     CTEST_VERBOSE(1);
-    // test_image_open();
-    // test_image_close();
-    // test_mkfs();
-    // test_alloc();
-    test_ialloc();
-    // test_bwrite_and_bread();
-    // test_find_free();
-    // test_set_free();
+    test_image_open();   
+    test_image_close();
+    test_mkfs();
+    test_alloc();
+    test_bwrite_and_bread();
+    test_find_free();
+    test_set_free();
     test_find_incore_free();
     test_find_incore();
     test_read_write_inode();
-    test_iget();
-    // test_iput();
+    test_iget_iput();
+    test_ialloc();
     CTEST_RESULTS();
     CTEST_EXIT();
 

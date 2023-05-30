@@ -25,7 +25,7 @@ ls.o: ls.c
 simfs_test.o: simfs_test.c
 	gcc -Wall -Wextra -c $<
 
-simfs.a: image.o block.o free.o mkfs.o inode.o pack.o
+simfs.a: image.o block.o free.o mkfs.o inode.o pack.o dir.o ls.o
 	ar rcs $@ $^
 
 simfs_test: simfs_test.c simfs.a

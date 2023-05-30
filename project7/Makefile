@@ -16,6 +16,12 @@ inode.o: inode.c
 pack.o: pack.c
 	gcc -Wall -Wextra -c $<
 
+dir.o: dir.c
+	gcc -Wall -Wextra -c $<
+
+ls.o: ls.c
+	gcc -Wall -Wextra -c $<
+
 simfs_test.o: simfs_test.c
 	gcc -Wall -Wextra -c $<
 

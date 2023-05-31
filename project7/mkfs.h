@@ -3,7 +3,7 @@
 
 #define FLAG_INIT 2
 #define ENTRY_SIZE 32
-#define INODE_SIZE 2
+#define INODE_NUM_SIZE 2
 
 void mkfs(void);
 

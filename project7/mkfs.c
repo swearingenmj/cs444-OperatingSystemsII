@@ -36,7 +36,6 @@ void mkfs(void){
 
     strcpy(dot, ".");
     strcpy(double_dot, "..");
-    printf("__block[2]: %d\n", block[2]);
     bwrite(new_data_block, block);
 
     iput(new_inode);

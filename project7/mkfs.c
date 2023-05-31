@@ -29,7 +29,7 @@ void mkfs(void){
     unsigned char block[BLOCK_SIZE] = {0};
 
     char *dot = (char *)block + 2;
-    char *double_dot = (char *)block +INODE_SIZE + ENTRY_SIZE;
+    char *double_dot = (char *)block + INODE_NUM_SIZE + ENTRY_SIZE;
 
     write_u16(block, new_inode->inode_num);
     write_u16(block, new_inode->inode_num);

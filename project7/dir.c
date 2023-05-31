@@ -74,7 +74,8 @@ int directory_get(struct directory *dir, struct directory_entry *ent){
 void directory_close(struct directory *d){
 
     // iput() the directory's in-core inode to free it up.
-
+    iput(d->inode);
     // free() the struct directory.
+    free(d);
 
 }

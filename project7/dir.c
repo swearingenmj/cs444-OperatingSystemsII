@@ -9,11 +9,11 @@
 #include <unistd.h>
 #include <string.h>
 
-struct directory *directory_open(int inode_num){
+struct directory *directory_open(int inode_num) {
     struct inode *node; 
     node = iget(inode_num);
     
-    if (node == NULL){
+    if (node == NULL) {
         return NULL;
     }
 
@@ -24,7 +24,7 @@ struct directory *directory_open(int inode_num){
     return dir;
 }
 
-int directory_get(struct directory *dir, struct directory_entry *ent){  
+int directory_get(struct directory *dir, struct directory_entry *ent) {  
     if (dir->offset >= dir->inode->size) {
         return -1;
     }
@@ -52,7 +52,8 @@ int directory_get(struct directory *dir, struct directory_entry *ent){
     return 0;
 }
 
-void directory_close(struct directory *d){
+void directory_close(struct directory *d) {
     iput(d->inode);
+    
     free(d);
 }

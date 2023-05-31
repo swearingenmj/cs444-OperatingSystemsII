@@ -14,7 +14,7 @@ void mkfs(void){
         write(image_fd, buf, BLOCK_SIZE);
     }
 
-    for (int i=0; i<7; i++){
+    for (int i = 0; i < 7; i++){
         alloc();
     }
 
@@ -27,14 +27,14 @@ void mkfs(void){
 
     unsigned char block[BLOCK_SIZE] = {0};
 
-    char *dot = (char *)(block);
-    char *double_dot = (char *)(block + ENTRY_SIZE);
+    char *dot = (char *)(block + INODE_SIZE);
+    char *double_dot = (char *)(block + ENTRY_SIZE + INODE_SIZE);
 
     write_u16(dot, new_inode->inode_num);
     write_u16(double_dot, new_inode->inode_num);
 
-    strcpy(dot + INODE_SIZE, ".");
-    strcpy(double_dot + INODE_SIZE + ENTRY_SIZE, "..");
+    strcpy(dot, ".");
+    strcpy(double_dot, "..");
     
     bwrite(new_data_block, block);
 

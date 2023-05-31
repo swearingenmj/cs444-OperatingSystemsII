@@ -4,6 +4,8 @@
 #include "mkfs.h"
 #include "ctest.h"
 #include "inode.h"
+#include "dir.h"
+#include "ls.h"
 
 #include <stdio.h>
 #include <unistd.h>
@@ -96,6 +98,8 @@ void test_mkfs(void){
     CTEST_ASSERT(free_block_num == 7, "assert 6 blocks reserved on making file system");
 
     image_close();
+
+
 }
 
 void test_find_incore_free(void){
@@ -168,11 +172,54 @@ void test_iget(void){
 }
 
 void test_iput(void){
-    
 }
 
 void test_ialloc(void){
+}
 
+void test_directory_open(void){
+    image_open("test_file", DO_TRUNCATE);
+    mkfs();
+
+    struct inode test_inode = {2, 2, 4, 4, 4, {0}, 1, 3};
+    iput(&test_inode);
+
+    struct directory *test_dir;
+    test_dir = directory_open(3);
+
+    CTEST_ASSERT(test_dir->inode->size == 2, "assert that the correct inode size was stored in the directory return from corresponding inode num");
+
+    fill_incore_array();
+    CTEST_ASSERT(directory_open(2) == NULL, "assert directory open returns NULL on full incore array");
+    empty_incore_array();
+}
+
+void test_directory_get(void){
+    image_open("test_file", DO_TRUNCATE);
+    mkfs();
+
+    // struct inode test_inode = {2, 2, 4, 4, 4, {0}, 1, 0};
+    // iput(&test_inode);
+
+    struct directory *test_dir;
+    test_dir = directory_open(0);
+    printf("test dir: %d\n", test_dir->inode->size);
+    struct directory_entry test_dir_entry;
+    // test_dir_entry->inode_num = 3;
+    // strcpy(test_dir_entry->name,"tester");
+
+    int return_value = directory_get(test_dir, &test_dir_entry);
+    printf("return value: %d\n", return_value);
+    printf("dir entry name: %s\n", test_dir_entry.name);
+    printf("dir entry num: %d\n", test_dir_entry.inode_num);
+
+}
+
+void run_ls(void){
+    image_open("test_file", DO_TRUNCATE);
+    mkfs();
+    ls();
+    image_close();
 }
 
 int main(){
@@ -182,15 +229,18 @@ int main(){
     // test_image_close();
     // test_mkfs();
     // test_alloc();
-    test_ialloc();
+    // test_ialloc();
     // test_bwrite_and_bread();
     // test_find_free();
     // test_set_free();
-    test_find_incore_free();
-    test_find_incore();
-    test_read_write_inode();
-    test_iget();
+    // test_find_incore_free();
+    // test_find_incore();
+    // test_read_write_inode();
+    // test_iget();
     // test_iput();
+    // test_directory_open();
+    // test_directory_get();
+    run_ls();
     CTEST_RESULTS();
     CTEST_EXIT();
 

@@ -10,6 +10,7 @@
 #define SET_AVAILABLE 0
 #define DO_TRUNCATE 1
 #define DO_NOT_TRUNCATE 0
+#define DIRECTORY_INODE_NUM 0
 
 // for testing purposes
 #define BYTE_TO_BINARY_PATTERN "%c%c%c%c%c%c%c%c"

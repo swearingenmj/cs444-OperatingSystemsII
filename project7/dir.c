@@ -41,14 +41,16 @@ int directory_get(struct directory *dir, struct directory_entry *ent){
     unsigned char block[BLOCK_SIZE] = {0};
     bread(data_block_num, block);
 
-    printf("__read into block: %d\n", block[2]);
+
    
     int offset_in_block = dir->offset % 4096;
+    printf("__offset in block: %d\n", offset_in_block);
+    printf("__read into block: %d\n", block[offset_in_block + 2]);
     int inode_num = read_u16(block + offset_in_block);
     ent->inode_num = inode_num;
     printf("__inode num: %d\n", inode_num);
 
-    char* read_block_name_ptr = (char*)block + 2;
+    char* read_block_name_ptr = (char*)block + offset_in_block + 2;
     strcpy(ent->name, read_block_name_ptr);
     printf("__name: %s\n", read_block_name_ptr);
 

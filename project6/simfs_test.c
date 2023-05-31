@@ -9,18 +9,18 @@
 #include <unistd.h>
 #include <string.h>
 
-void test_image_open(void){
+void test_image_open(void) {
     CTEST_ASSERT(image_open("new_file", 1) != -1, "assert image open succeeds");
     CTEST_ASSERT(image_open("/new_file", 1) == -1, "assert improper image open fails");
 }
 
-void test_image_close(void){
+void test_image_close(void) {
     CTEST_ASSERT(image_close() == -1, "assert image close succeeds");
     image_open("test_file", 1);
     CTEST_ASSERT(image_close() != -1, "assert image close succeeds");
 }
 
-void test_bwrite_and_bread(void){
+void test_bwrite_and_bread(void) {
     unsigned char write_block[BLOCK_SIZE] = "hello";
     unsigned char read_block[BLOCK_SIZE] = {0};
     CTEST_ASSERT(memcmp(write_block, read_block, BLOCK_SIZE) != 0, "assert originating buffers don't match");
@@ -29,7 +29,7 @@ void test_bwrite_and_bread(void){
     CTEST_ASSERT(memcmp(write_block, read_block, BLOCK_SIZE) == 0, "assert write and read buffers match");
 }
 
-void test_find_free(void){
+void test_find_free(void) {
     unsigned char test_buf[BLOCK_SIZE] = {1};
     CTEST_ASSERT(find_free(test_buf) == 1, "assert find_free() returns 1 for 0b0000001");
     unsigned char test_buf_2[BLOCK_SIZE] = {191};
@@ -38,7 +38,7 @@ void test_find_free(void){
     CTEST_ASSERT(find_free(test_buf_3) == 9, "assert find_free() returns 9 for 0b0000010111111111");
 }
 
-void test_set_free(void){
+void test_set_free(void) {
     unsigned char test_block_1[BLOCK_SIZE] = {5};
     unsigned char compare_block_1[BLOCK_SIZE] = {5};
     unsigned char compare_block_1a[BLOCK_SIZE] = {4};
@@ -60,7 +60,7 @@ void test_set_free(void){
     CTEST_ASSERT(memcmp(test_block_3, compare_block_3, BLOCK_SIZE) == 0, "assert set_free() sets second bit to 1 for 0b00000101");
 }
 
-void test_alloc(void){
+void test_alloc(void) {
 
     unsigned char read_block[BLOCK_SIZE];
     unsigned char compare_block[BLOCK_SIZE] = {1};
@@ -81,7 +81,7 @@ void test_alloc(void){
     CTEST_ASSERT(alloc_return == 2, "assert alloc() returns 2 third");
 }
 
-void test_mkfs(void){
+void test_mkfs(void) {
 
     image_open("test_file", DO_TRUNCATE);
     unsigned char read_block[BLOCK_SIZE];
@@ -98,7 +98,7 @@ void test_mkfs(void){
     image_close();
 }
 
-void test_find_incore_free(void){
+void test_find_incore_free(void) {
 
     // returns an inode with size 0 on new incore stack
     struct inode test_inode = *find_incore_free();
@@ -112,7 +112,7 @@ void test_find_incore_free(void){
     empty_incore_array();
 }
 
-void test_find_incore(void){
+void test_find_incore(void) {
 
     // returns inode with correct inode num, and non-zero ref_count
     fill_incore_array();
@@ -124,7 +124,7 @@ void test_find_incore(void){
     CTEST_ASSERT(find_incore(0) == NULL, "assert find_incore(0) returns NULL if incore array is empty");
 }
 
-void test_read_write_inode(void){
+void test_read_write_inode(void) {
 
     // set up file system and write to block 3
     image_open("test_file", DO_TRUNCATE);
@@ -149,7 +149,7 @@ void test_read_write_inode(void){
     image_close();
 }
 
-void test_iget_iput(void){
+void test_iget_iput(void) {
     image_open("test_file", DO_TRUNCATE);
     mkfs();
 
@@ -167,7 +167,7 @@ void test_iget_iput(void){
     image_close();
 }
 
-void test_ialloc(void){
+void test_ialloc(void) {
 
     image_open("test_file", DO_TRUNCATE);
     mkfs();
@@ -187,7 +187,7 @@ void test_ialloc(void){
     CTEST_ASSERT(ialloc() == NULL, "assert ialloc() returns NULL values on full incore array");
 }
 
-int main(){
+int main() {
 
     CTEST_VERBOSE(1);
     test_image_open();   

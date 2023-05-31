@@ -1,13 +1,10 @@
 #include "ls.h"
 #include "dir.h"
-
 #include <stdio.h>
 #include <unistd.h>
 #include <string.h>
 
-// TODO: test code
-void ls(void){
-    printf("_ls\n");
+void ls(void) {
     struct directory *dir;
     struct directory_entry ent;
 

@@ -1,4 +1,5 @@
 #include "mkfs.h"
+#include "pack.h"
 #include "block.h"
 #include "image.h"
 #include "inode.h"
@@ -14,7 +15,7 @@ void mkfs(void){
         write(image_fd, buf, BLOCK_SIZE);
     }
 
-    for (int i=0; i<7; i++){
+    for (int i = 0; i < 7; i++){
         alloc();
     }
 

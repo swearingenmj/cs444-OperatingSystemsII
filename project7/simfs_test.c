@@ -245,7 +245,7 @@ void test_directory_close(void){
     test_dir = directory_open(0);
     
     struct directory_entry test_dir_entry;
-    int return_value = directory_get(test_dir, &test_dir_entry);
+    directory_get(test_dir, &test_dir_entry);
 
     CTEST_ASSERT(test_dir->offset == 32, "assert test directory offset is 32 before directory_close() is called");
 

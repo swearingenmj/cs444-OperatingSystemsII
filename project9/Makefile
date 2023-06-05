@@ -22,10 +22,16 @@ dir.o: dir.c
 ls.o: ls.c
 	gcc -Wall -Wextra -c $<
 
+namei.o: namei.c
+	gcc -Wall -Wextra -c $<
+
+dirbasename.o: dirbasename.c
+	gcc -Wall -Wextra -c $<
+
 simfs_test.o: simfs_test.c
 	gcc -Wall -Wextra -c $<
 
-simfs.a: image.o block.o free.o mkfs.o inode.o pack.o dir.o ls.o
+simfs.a: image.o block.o free.o mkfs.o inode.o pack.o dir.o ls.o namei.o dirbasename.o
 	ar rcs $@ $^
 
 simfs_test: simfs_test.c simfs.a

@@ -3,6 +3,6 @@
 
 #define ROOT_INODE_NUM 0
 
-void namei(char *path);
+struct inode *namei(char *path);
 
 #endif

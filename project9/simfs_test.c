@@ -6,6 +6,7 @@
 #include "inode.h"
 #include "ls.h"
 #include "dir.h"
+#include "namei.h"
 #include <stdio.h>
 #include <unistd.h>
 #include <string.h>
@@ -269,6 +270,10 @@ void test_directory_close(void){
     empty_incore_array();
 }
 
+void test_namei(void) {
+    namei("/");
+}
+
 void run_ls(void){
     image_open("test_file", DO_TRUNCATE);
     mkfs();
@@ -298,6 +303,7 @@ int main() {
     test_directory_open();
     test_directory_get();
     test_directory_close();
+    test_namei();
     CTEST_RESULTS();
     run_ls();
     CTEST_EXIT();

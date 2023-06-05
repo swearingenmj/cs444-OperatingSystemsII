@@ -52,3 +52,10 @@ void directory_close(struct directory *d) {
     
     free(d);
 }
+
+int directory_make(char *path) {
+    // find the directory path that will contain the new directory - use dirbasename.c
+    // find the new directory name from the path - use dirbasename.c
+    // find the inode for the parent directory that will hold the new entry (namei())
+    // create a new inode for the new directroy (ialloc())
+}

@@ -110,12 +110,13 @@ void read_inode(struct inode *in, int inode_num) {
 
 void write_inode(struct inode *in) {
     // map inode_num to block and offset
+    int block_num = in->inode_num / INODES_PER_BLOCK + INODE_FIRST_BLOCK;
     int block_offset = in->inode_num % INODES_PER_BLOCK;
     int block_offset_bytes = block_offset * INODE_SIZE;
 
     // read the data from disk into a block
     unsigned char inode_block[BLOCK_SIZE];
-    bread(in->inode_num, inode_block);
+    bread(block_num, inode_block);
 
     // pack (write) to the disk from in
     write_u32(inode_block + block_offset_bytes, in->size);
@@ -130,7 +131,7 @@ void write_inode(struct inode *in) {
     }
 
     // write data from block to disk
-    bwrite(in->inode_num, inode_block);
+    bwrite(block_num, inode_block);
 }
 
 struct inode *iget(int inode_num) {

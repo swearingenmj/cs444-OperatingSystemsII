@@ -23,12 +23,21 @@ void test_image_close(void) {
 }
 
 void test_bwrite_and_bread(void) {
+    image_open("test_file", DO_TRUNCATE);
+    mkfs();
+
     unsigned char write_block[BLOCK_SIZE] = "hello";
     unsigned char read_block[BLOCK_SIZE] = {0};
+    
     CTEST_ASSERT(memcmp(write_block, read_block, BLOCK_SIZE) != 0, "assert originating buffers don't match");
+    
     bwrite(3, write_block);
     bread(3, read_block);
+    
     CTEST_ASSERT(memcmp(write_block, read_block, BLOCK_SIZE) == 0, "assert write and read buffers match");
+    
+    image_close();
+    empty_incore_array();
 }
 
 void test_find_free(void) {
@@ -87,7 +96,6 @@ void test_alloc(void) {
 void test_find_incore_free(void) {
     // returns an inode with size 0 on new incore stack
     struct inode test_inode = *find_incore_free();
-    // printf("made it here"); 
     CTEST_ASSERT(test_inode.size == 0, "assert find_incore_free() returns empty (size 0) inode on a new incore stack");
 
     // returns NULL on a full incore stack
@@ -204,7 +212,7 @@ void test_directory_open(void){
     iput(&test_inode);
     test_dir = directory_open(3);
     
-    CTEST_ASSERT(test_dir->inode->size == 1, "assert that directory_open() returns directory with inode size equal to that of specific inode number");
+    CTEST_ASSERT(test_dir->inode->size == 2, "assert that directory_open() returns directory with inode size equal to that of specific inode number");
 
     fill_incore_array();
    
@@ -224,8 +232,7 @@ void test_directory_get(void){
     struct directory_entry test_dir_entry;
     int return_value = directory_get(test_dir, &test_dir_entry);
 
-    CTEST_ASSERT(return_value == -1, "assert directory_get() returns 0 for initial call on a new file system");
-    printf("test_dir_entry.name: %s\n", test_dir_entry.name);
+    CTEST_ASSERT(return_value == 0, "assert directory_get() returns 0 for initial call on a new file system");
     CTEST_ASSERT(strcmp(test_dir_entry.name,".") == 0, "assert directory_get() modifys the name '.' for the first call on an initialized file system");
     CTEST_ASSERT(test_dir_entry.inode_num == 0, "assert directory_get() modifys the inode number 0 for the first call on an initialized file system");
     

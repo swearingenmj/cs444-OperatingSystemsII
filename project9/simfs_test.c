@@ -19,15 +19,25 @@ void test_image_close(void) {
     CTEST_ASSERT(image_close() == -1, "assert image close succeeds");
     image_open("test_file", 1);
     CTEST_ASSERT(image_close() != -1, "assert image close succeeds");
+    image_close();
 }
 
 void test_bwrite_and_bread(void) {
+    image_open("test_file", DO_TRUNCATE);
+    mkfs();
+
     unsigned char write_block[BLOCK_SIZE] = "hello";
     unsigned char read_block[BLOCK_SIZE] = {0};
+    
     CTEST_ASSERT(memcmp(write_block, read_block, BLOCK_SIZE) != 0, "assert originating buffers don't match");
+    
     bwrite(3, write_block);
     bread(3, read_block);
+    
     CTEST_ASSERT(memcmp(write_block, read_block, BLOCK_SIZE) == 0, "assert write and read buffers match");
+    
+    image_close();
+    empty_incore_array();
 }
 
 void test_find_free(void) {
@@ -62,7 +72,6 @@ void test_set_free(void) {
 }
 
 void test_alloc(void) {
-
     unsigned char read_block[BLOCK_SIZE];
     unsigned char compare_block[BLOCK_SIZE] = {1};
     int alloc_return;
@@ -80,13 +89,13 @@ void test_alloc(void) {
     
     alloc_return = alloc();
     CTEST_ASSERT(alloc_return == 2, "assert alloc() returns 2 third");
+
+    image_close();
 }
 
 void test_find_incore_free(void) {
-
     // returns an inode with size 0 on new incore stack
     struct inode test_inode = *find_incore_free();
-    // printf("made it here"); 
     CTEST_ASSERT(test_inode.size == 0, "assert find_incore_free() returns empty (size 0) inode on a new incore stack");
 
     // returns NULL on a full incore stack
@@ -97,7 +106,6 @@ void test_find_incore_free(void) {
 }
 
 void test_find_incore(void) {
-
     // returns inode with correct inode num, and non-zero ref_count
     fill_incore_array();
     struct inode test_incore = *find_incore(0);
@@ -109,7 +117,6 @@ void test_find_incore(void) {
 }
 
 void test_read_write_inode(void) {
-
     // set up file system and write to block 3
     image_open("test_file", DO_TRUNCATE);
     mkfs();
@@ -131,6 +138,7 @@ void test_read_write_inode(void) {
     CTEST_ASSERT(test_read_inode.block_ptr[0] == 1, "assert read_inode() reads block_ptr[0] correctly");
 
     image_close();
+    empty_incore_array();
 }
 
 void test_iget_iput(void) {
@@ -149,10 +157,10 @@ void test_iget_iput(void) {
     CTEST_ASSERT(test_inode_ptr->link_count == 4, "assert iget() returns correct link_count");
 
     image_close();
+    empty_incore_array();
 }
 
 void test_ialloc(void) {
-
     image_open("test_file", DO_TRUNCATE);
     mkfs();
    
@@ -169,10 +177,12 @@ void test_ialloc(void) {
     // fill incore array, assert null
     fill_incore_array();
     CTEST_ASSERT(ialloc() == NULL, "assert ialloc() returns NULL values on full incore array");
+
+    image_close();
+    empty_incore_array();
 }
 
 void test_mkfs(void) {
-
     image_open("test_file", DO_TRUNCATE);
     unsigned char read_block[BLOCK_SIZE];
 
@@ -186,6 +196,7 @@ void test_mkfs(void) {
     CTEST_ASSERT(free_block_num == 8, "assert 7 blocks reserved on making file system");
 
     image_close();
+    empty_incore_array();
 }
 
 void test_directory_open(void){
@@ -207,8 +218,8 @@ void test_directory_open(void){
    
     CTEST_ASSERT(directory_open(2) == NULL, "assert directory_open() returns NULL on full incore array");
    
-    empty_incore_array();
     image_close();
+    empty_incore_array();
 }
 
 void test_directory_get(void){
@@ -235,6 +246,7 @@ void test_directory_get(void){
 
     directory_close(test_dir);
     image_close();
+    empty_incore_array();
 }
 
 void test_directory_close(void){
@@ -254,6 +266,7 @@ void test_directory_close(void){
     CTEST_ASSERT(test_dir->offset != 32, "assert test directory offset is not 32 after directory_close() is called");
 
     image_close();
+    empty_incore_array();
 }
 
 void run_ls(void){
@@ -262,7 +275,9 @@ void run_ls(void){
 
     printf("\nResults from running ls()\n");
     ls();
+
     image_close();
+    empty_incore_array();
 }
 
 int main() {

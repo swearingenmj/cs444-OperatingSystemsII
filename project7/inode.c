@@ -110,8 +110,7 @@ void read_inode(struct inode *in, int inode_num) {
 
 void write_inode(struct inode *in) {
     // map inode_num to block and offset
-    int block_num = in->inode_num / INODES_PER_BLOCK + INODE_FIRST_BLOCK;
-    int block_offset = block_num % INODES_PER_BLOCK;
+    int block_offset = in->inode_num % INODES_PER_BLOCK;
     int block_offset_bytes = block_offset * INODE_SIZE;
 
     // read the data from disk into a block

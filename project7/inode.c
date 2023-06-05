@@ -34,12 +34,14 @@ struct inode *ialloc(void) {
     if (free_inode_num == -1) {
         return NULL;
     }
+
+    struct inode *incore_inode = iget(free_inode_num);
     
-    if (iget(free_inode_num) == NULL) {
+    if (incore_inode == NULL) {
         return NULL;
     }
 
-    struct inode *incore_inode = iget(free_inode_num);
+    // struct inode *incore_inode = iget(free_inode_num);
     
     incore_inode->size = 0;
     incore_inode->owner_id = 0;

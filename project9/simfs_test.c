@@ -274,6 +274,11 @@ void test_namei(void) {
     namei("/");
 }
 
+void test_directory_make(void) {
+    int return_status = directory_make("/foo");
+    printf("directory make return status: %d\n", return_status);
+}
+
 void run_ls(void){
     image_open("test_file", DO_TRUNCATE);
     mkfs();
@@ -304,6 +309,7 @@ int main() {
     test_directory_get();
     test_directory_close();
     test_namei();
+    test_directory_make();
     CTEST_RESULTS();
     run_ls();
     CTEST_EXIT();

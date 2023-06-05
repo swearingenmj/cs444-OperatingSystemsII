@@ -58,4 +58,16 @@ int directory_make(char *path) {
     // find the new directory name from the path - use dirbasename.c
     // find the inode for the parent directory that will hold the new entry (namei())
     // create a new inode for the new directroy (ialloc())
+    // create a new data block for the new directory entries (alloc())
+    // create a new block-sized array for the new directory data block and initialize it . and .. files.
+        // the . should contain the new directory's inode number
+        // the .. should contain the parent director's inode number
+    // initialize the new directory incore inode with a proper size and other fields
+    // write the new directory data block to dish (bwrite())
+    // from the parent directory inode, find the block that will contain the new directory entry (using size and block_ptr fields)
+    // read that block into memory unless you're creating a new one (bread()) and add the new directory entry to it
+    // write that block to disk (bwrite())
+    // update the parent directory's size field (which should increase by 32)
+    // release the new directory's incore inode (iput())
+    // release the parent directory's incore inode (iput())
 }

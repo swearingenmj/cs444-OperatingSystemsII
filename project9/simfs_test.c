@@ -271,7 +271,12 @@ void test_directory_close(void){
 }
 
 void test_namei(void) {
-    namei("/");
+    image_open("test_file", DO_TRUNCATE);
+    mkfs();
+    struct inode *in = namei("/");
+    CTEST_ASSERT(in->ref_count > 0, "assert namei('/') returns inode with non zero ref_count");
+    image_close();
+    empty_incore_array();
 }
 
 void test_directory_make(void) {

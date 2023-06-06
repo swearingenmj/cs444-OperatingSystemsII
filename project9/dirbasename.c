@@ -46,23 +46,23 @@ char *get_basename(const char *path, char *basename)
     return basename;
 }
 
-int main(void)
-{
-    char result[1024];
+// int main(void)
+// {
+//     char result[1024];
 
-    puts(get_dirname("/foo/bar/baz", result)); // /foo/bar
-    puts(get_dirname("/foo/bar", result));     // /foo
-    puts(get_dirname("/foo", result));         // /
-    puts(get_dirname("/", result));            // /
-    puts(get_dirname("foo", result));          // .
-    puts(get_dirname("", result));             // .
+//     puts(get_dirname("/foo/bar/baz", result)); // /foo/bar
+//     puts(get_dirname("/foo/bar", result));     // /foo
+//     puts(get_dirname("/foo", result));         // /
+//     puts(get_dirname("/", result));            // /
+//     puts(get_dirname("foo", result));          // .
+//     puts(get_dirname("", result));             // .
 
-    puts(get_basename("/foo/bar/baz", result)); // baz
-    puts(get_basename("/foo/bar", result));     // bar
-    puts(get_basename("/foo", result));         // foo
-    puts(get_basename("/", result));            // /
-    puts(get_basename("foo", result));          // foo
-    puts(get_basename("", result));             // 
-}
+//     puts(get_basename("/foo/bar/baz", result)); // baz
+//     puts(get_basename("/foo/bar", result));     // bar
+//     puts(get_basename("/foo", result));         // foo
+//     puts(get_basename("/", result));            // /
+//     puts(get_basename("foo", result));          // foo
+//     puts(get_basename("", result));             // 
+// }
 
 

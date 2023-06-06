@@ -40,8 +40,6 @@ struct inode *ialloc(void) {
     if (incore_inode == NULL) {
         return NULL;
     }
-
-    // struct inode *incore_inode = iget(free_inode_num);
     
     incore_inode->size = 0;
     incore_inode->owner_id = 0;

@@ -280,8 +280,30 @@ void test_namei(void) {
 }
 
 void test_directory_make(void) {
+    image_open("test_file", DO_TRUNCATE);
+    mkfs();
+    
     int return_status = directory_make("/foo");
-    printf("directory make return status: %d\n", return_status);
+    
+    CTEST_ASSERT(return_status ==  0, "assert directory_make('/foo') returns 1 for success");
+
+    struct directory *test_dir;
+    test_dir = directory_open(0);
+    
+    struct directory_entry test_dir_entry;
+    
+    int return_value = directory_get(test_dir, &test_dir_entry);
+    return_value = directory_get(test_dir, &test_dir_entry);
+    return_value = directory_get(test_dir, &test_dir_entry);
+   
+    CTEST_ASSERT(strcmp(test_dir_entry.name, "foo") == 0, "assert directory_get(0) will return foo after three calls to the root dir (0)");
+    
+    return_value = directory_get(test_dir, &test_dir_entry);
+   
+   CTEST_ASSERT(return_value == -1, "assert direcotry_get(0) will return a failure after iterating three times on root dir after adding foo");
+    
+    image_close();
+    empty_incore_array();
 }
 
 void run_ls(void){

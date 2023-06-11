@@ -99,15 +99,83 @@ When process A then tries to write to the block with a new entry, it will over w
 # How to fix the race
 
 To fix this race condition, you would have to put put a lock around lines 8-49 because within that area the parent block is read, conditionally checked, and written to. 
-## Race Condition 3 
+## Race Condition 3
 
 # Where the race is
 
 ```
-<insert code> 
+0  int alloc(void) {
+1      unsigned char data_map[BLOCK_SIZE] = {0};
+2      
+3      bread(DATA_MAP_NUM, data_map);
+4      
+5      int lowest_free = find_free(data_map);
+6      
+7      set_free(data_map, lowest_free, SET_UNAVAILABLE);
+8      
+9      bwrite(DATA_MAP_NUM, data_map);
+10     
+11     return lowest_free;
+12 }
 ```
 
 # Example of how a race could result in expected values or situations
 
+In the alloc() function, the function initializes the data_map array and calls bread() to read the data from the disk into the data_map. If multiple threads execute alloc() at the same time, they may end up reading the same data_map from disk simultaneously. If they find the same lowest_free they may both attempt to modify the data_map to mark the block as unavailable by calling set_free().  
+
 # How to fix the race
 
+To fix the race condition, we can put a lock around lines 7-9. This will ensure that only one thread can modify the data_map at a time.
+
+## Race Condition 4
+
+# Where the race is
+
+```
+0  void iput(struct inode *in) {
+1      if (in->ref_count == 0) {
+2          return;
+3      }
+4
+5      in->ref_count--;
+6    
+7      if (in->ref_count == 0) {
+8          write_inode(in);
+9      }
+10 }
+```
+
+# Example of how a race could result in expected values or situations
+
+If multiple thread call iput() at the same time on the same inode it's possible for them to enter a critical section after checking the ref_count but before decrementing it. Both threads may end up decrementing the ref_count to - and both threads may attempt to write the inode to disk.   
+
+# How to fix the race
+
+To fix this we could do something like this:
+
+```
+0  pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
+1  pthread_cond_t cond = PTHREAD_COND_INITIALIZER;
+2
+3  void iput(struct inode *in) {
+4      pthread_mutex_lock(&lock);           // lock it!
+5
+6      if (in->ref_count == 0) {
+7          pthread_mutex_unlock(&lock);     // unlock it! (if we don't need to do anything)
+8          return;
+9      }
+10
+11     in->ref_count--;
+12    
+13     if (in->ref_count == 0) {
+14         write_inode(in);
+15         pthread_cond_signal(&cond);      // signal that we're done!
+16     } else {
+17         pthread_cond_wait(&cond, &lock); // wait for someone to signal that they're done!
+1      }
+19
+20     pthread_mutex_unlock(&lock);         // unlock it!
+21  }
+```
+
+By using a conditional lock we can avoid holding the mutex for the entire duration of the function, allowing other threads to access iput() concurrently.
